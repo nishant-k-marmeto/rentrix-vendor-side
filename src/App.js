@@ -8,6 +8,8 @@ import SignupPage from "./component/SignupPage";
 import "./styles.css"
 import Dashboard from "./component/Dashboard"
 import HeaderMain from "./component/HeaderMain";
+import ProtectedRoute from "./component/ProtectedRoute";
+import { AuthProvider } from "./authContext/AuthContext";
 
 
 export default function App() {
@@ -40,7 +42,11 @@ const appRouter = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <ProtectedRoute
+        element={<Dashboard />}
+      />
+    ),
     errorElement: <Alert
       message="Error Text"
       showIcon
@@ -57,4 +63,4 @@ const appRouter = createBrowserRouter([
 );
 
 const root = ReactDOM.createRoot(document.getElementById("app")); // Use createRoot
-root.render(<RouterProvider router={appRouter} />);
+root.render( <AuthProvider><RouterProvider router={appRouter} /></AuthProvider>);

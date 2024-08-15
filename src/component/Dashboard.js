@@ -6,8 +6,10 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from '@ant-design/icons';
-import { Avatar, Button, Layout, Menu, theme } from 'antd';
+import { Button, Layout, Menu, theme } from 'antd';
 import UploadComponent from './UploadComponent';
+import TableContent from './TableContent';
+import UserProfileDetail from './UserProfileDetail';
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,9 +27,9 @@ export default function Dashboard() {
   const renderContent = () => {
     switch (selectedMenu) {
       case '1':
-        return (<Avatar>Aabhu</Avatar>);
+        return (<UserProfileDetail/>);
       case '2':
-        return (<h2>New Broker</h2>);
+        return (<TableContent/>);
       case '3':
         return (<UploadComponent/>);
       default:
@@ -53,7 +55,7 @@ export default function Dashboard() {
             {
               key: '2',
               icon: <VideoCameraOutlined />,
-              label: 'nav 2',
+              label: 'Device List',
             },
             {
               key: '3',

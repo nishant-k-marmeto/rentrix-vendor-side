@@ -1,16 +1,12 @@
-import React from "react";
 import React, { useState } from "react";
-import "../../supabase"
+import LoginHeader from "./LoginHeader";
+import supabase from '../../supabase';
 import {
-    AutoComplete,
     Button,
     Cascader,
     Checkbox,
-    Col,
     Form,
     Input,
-    InputNumber,
-    Row,
     Select,
     Modal,
 } from "antd";
@@ -79,12 +75,13 @@ export default function Signup() {
     );
 
     const onFinish = async (values) => {
+        console.log("values", values);
         try {
             // Sign up user with Supabase
-            const { user, error: signupError } = await supabase.auth.signUp({
-                email: values.email,
-                password: values.password,
-            });
+            // const { vendor_data, error: signupError } = await supabase.auth.signUp({
+            //     email: values.email,
+            //     password: values.password,
+            // });
 
             if (signupError) {
                 throw signupError;
@@ -92,14 +89,20 @@ export default function Signup() {
 
             // Insert additional user data into the 'users' table
             const { error: insertError } = await supabase
-                .from('users')
+                .from('vendor_data')
                 .insert([
-                    {
+                    {   
+                        firstname: values.firstName,
+                        lastname: values.lastName,
+                        bussinessname: values.bussinessName,
+                        gst: values.gst,
                         email: values.email,
-                        phone: values.phone,
+                        addressline1: values.addressLine1,
+                        addressline2: values.addressLine2,
                         residence: values.residence,
                         pin: values.pin,
-                        gender: values.gender,
+                        phone: values.phone,
+                        metadata: {}
                     }
                 ]);
 
@@ -108,6 +111,7 @@ export default function Signup() {
             }
 
             showSuccessModal();
+            navigate('/login');
             console.log("SignUp:", user);
         } catch (error) {
             console.error("SignUp:", error.message);
@@ -116,7 +120,8 @@ export default function Signup() {
 
 
     return (
-        <>
+        <section className='bg-gradient-to-r from-[#a69fdf] to-[#03A9F4]'>
+            <LoginHeader heading="Register Account" />
             <Form
                 className="w-full p-6 grid justify-center align-center"
                 {...formItemLayout}
@@ -124,11 +129,73 @@ export default function Signup() {
                 name="register"
                 onFinish={onFinish}
                 initialValues={{
-                    residence: ["Select State"],
+                    residence: "Select State",
                     prefix: "91",
                 }}
                 scrollToFirstError
             >
+                <Form.Item
+                    name="firstName"
+                    label="First Name"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please enter First Name",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="lastName"
+                    label="Last Name"
+                    rules={[
+                        {
+                            required: false,
+                            message: "Please Enter Last Name",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+
+                <Form.Item
+                    name="bussinessName"
+                    label="Bussiness Name"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please Enter Last Name",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="gst"
+                    label="GST Number"
+                    hasFeedback
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please input your GST!",
+                        },
+                    ]}
+                >
+                    <Input
+                        type="text"
+                        showCount
+                        maxLength={15}
+                        allowClear
+                        style={{
+                            width: "100%",
+                        }}
+                    />
+                </Form.Item>
+
                 <Form.Item
                     name="email"
                     label="E-mail"
@@ -186,11 +253,36 @@ export default function Signup() {
                 </Form.Item>
 
                 <Form.Item
+                    name="addressLine1"
+                    label="Address Line 1"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please enter your address!",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    name="addressLine2"
+                    label="Address Line 2"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please enter your address!",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
                     name="residence"
                     label="State"
                     rules={[
                         {
-                            type: "array",
                             required: true,
                             message: "Please select your state!",
                         },
@@ -220,37 +312,7 @@ export default function Signup() {
                         style={{
                             width: "100%",
                         }}
-                        onChange={(e) => {
-                            if (e.target.value.length === 6) {
-                                const pinCode = e.target.value;
-                                fetch(`https://api.postalpincode.in/pincode/${pinCode}`)
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                        console.log(data);
-                                        // Handle the API response data
-                                        if (data[0].Status === "Success") {
-                                            setValidateStatus("success");
-                                            const postalData = data[0]?.PostOffice[0]?.District;
-                                            const successText = document.getElementById("resNode");
-                                            successText.append("Location:", postalData);
-                                            console.log(postalData);
-                                        } else {
-                                            setValidateStatus("error");
-                                            // const failedText= document.createElement("p");
-                                            // const failedNode = document.createTextNode("Not a valid Pin Code!");
-                                            // failedText.append(failedNode)
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        setValidateStatus("error");
-                                        // const errorText= document.createElement("p");
-                                        // const errordNode = document.createTextNode("Please try again!");
-                                        // errorText.append(errordNode);
-                                    });
-                            }
-                        }}
                     />
-                    <span id="resNode"> </span>
                 </Form.Item>
 
                 <Form.Item
@@ -271,23 +333,6 @@ export default function Signup() {
                             width: "100%",
                         }}
                     />
-                </Form.Item>
-
-                <Form.Item
-                    name="gender"
-                    label="Gender"
-                    rules={[
-                        {
-                            required: false,
-                            message: "Please select gender!",
-                        },
-                    ]}
-                >
-                    <Select placeholder="select your gender">
-                        <Option value="male">Male</Option>
-                        <Option value="female">Female</Option>
-                        <Option value="other">Other</Option>
-                    </Select>
                 </Form.Item>
 
                 <Form.Item
@@ -313,6 +358,6 @@ export default function Signup() {
                     </Button>
                 </Form.Item>
             </Form>
-        </>
+        </section>
     );
 }

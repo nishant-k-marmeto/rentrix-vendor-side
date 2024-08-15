@@ -1,17 +1,36 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 import LoginHeader from './LoginHeader';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../authContext/AuthContext';
+import supabase from '../../supabase';
 
 export default function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
+  const onFinish = async (values) => {
+    const { email, password } = values;
+    console.log('email', email + 'password', password);
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword( {
+        email, password,
+      });
+      if (error) {
+        console.error('Supabase error:', error.message);
+        throw error;
+      }
+        debugger
+        navigate('/dashboard')
+        login();
+    } catch (error) {
+      console.error('Login error:', error.message);
+    }
   };
 
   return (
-    <>
+    <section className='bg-gradient-to-r from-[#a69fdf] to-[#03A9F4]'>
       <LoginHeader heading='Log in' />
       <Form
         name="login"
@@ -28,26 +47,34 @@ export default function Login() {
         onFinish={onFinish}
       >
         <Form.Item
-          name="username"
+          name="email"
           rules={[
             {
+              type: "email",
+              message: "The input is not valid E-mail!",
+            },
+            {
               required: true,
-              message: 'Please input your Username!',
+              message: "Please input your E-mail!",
             },
           ]}
         >
-          <Input prefix={<UserOutlined />} placeholder="Username" />
+          <Input prefix={<UserOutlined />} placeholder="E-mail" />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[
             {
               required: true,
-              message: 'Please input your Password!',
+              message: "Please input your Password!",
             },
           ]}
         >
-          <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
+          <Input
+            prefix={<LockOutlined />}
+            type="password"
+            placeholder="Password"
+          />
         </Form.Item>
         <Form.Item>
           <Flex justify="space-between" align="center">
@@ -70,6 +97,6 @@ export default function Login() {
           </Link>
         </Form.Item>
       </Form>
-    </>
+    </section>
   );
 }
