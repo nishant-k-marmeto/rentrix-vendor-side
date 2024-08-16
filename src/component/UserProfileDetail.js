@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Descriptions, Avatar, Button } from "antd";
+import { Menu, Descriptions, Avatar, Button, Steps } from "antd";
 import { PoweroffOutlined } from '@ant-design/icons';
 import { useAuth } from "../authContext/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -56,6 +56,28 @@ export default function UserProfileDetail(){
     const { firstname, lastname, bussinessname, addressline1, addressline2, email, gst, phone, pin, residence, metadata } = userData;
    
     const items = [
+      {
+        label: ( <Steps
+          className="mr-auto"
+          current={1}
+          status="error"
+          items={[
+            {
+              title: 'Finished',
+              description:'Congratulation! Registration done',
+            },
+            {
+              title: 'In Process',
+              description:'Upload the files for Verification'
+            },
+            {
+              title: 'Waiting',
+              description:'Please upload the informations'
+            },
+          ]}
+        /> ),
+        key: 'progress',
+      },
       {
         label: (<Avatar> { firstname } </Avatar> ),
         key: 'user',

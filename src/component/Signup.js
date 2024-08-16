@@ -78,10 +78,10 @@ export default function Signup() {
         console.log("values", values);
         try {
             // Sign up user with Supabase
-            // const { vendor_data, error: signupError } = await supabase.auth.signUp({
-            //     email: values.email,
-            //     password: values.password,
-            // });
+            const { vendor_data, error: signupError } = await supabase.auth.signUp({
+                email: values.email,
+                password: values.password,
+            });
 
             if (signupError) {
                 throw signupError;
@@ -91,7 +91,7 @@ export default function Signup() {
             const { error: insertError } = await supabase
                 .from('vendor_data')
                 .insert([
-                    {   
+                    {   user_id:supabase.auth.signUp.id,
                         firstname: values.firstName,
                         lastname: values.lastName,
                         bussinessname: values.bussinessName,
