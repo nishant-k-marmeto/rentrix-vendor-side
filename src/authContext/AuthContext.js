@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
   useEffect(() => {
     // Check if there's a session stored in localStorage
@@ -18,9 +19,14 @@ export function AuthProvider({ children }) {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('process.env.SUPABASE_AUTH_TOKEN'); // Optional: clear token if applicable
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut(); // Clear session from Supabase
+      setIsAuthenticated(false);
+      localStorage.removeItem(session); // Optionally clear local storage
+    } catch (error) {
+      console.error('Logout error:', error.message);
+    }
   };
 
   return (

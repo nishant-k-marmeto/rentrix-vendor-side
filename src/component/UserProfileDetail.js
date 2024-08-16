@@ -1,22 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Avatar, Descriptions } from "antd";
+import { Menu, Descriptions, Avatar, Button } from "antd";
+import { PoweroffOutlined } from '@ant-design/icons';
+import { useAuth } from "../authContext/AuthContext";
+import { useNavigate } from "react-router-dom";
 import supabase from "../../supabase";
 import { data } from "autoprefixer";
 
 
 export default function UserProfileDetail(){
+    const emailVer = localStorage.getItem('email-user')
     const [current, setCurrent] = useState('user');
     const [userData, setUserData] = useState({});
+    const navigate = useNavigate();
+
+    const { logout } = useAuth();
+    const handleLogout = async () => {
+      try {
+        await logout();
+        navigate('/login'); // Redirect to login page after successful logout
+      } catch (error) {
+        console.error('Logout error:', error.message);
+        // Optionally, show an error message to the user
+      }
+    };
 
     useEffect(() => {
       const fetchData = async () => {
+        const { data: { user }, errorr } = await supabase.auth.getUser();
+
+        if (errorr) {
+            console.error('Error fetching user:', error);
+            return;
+        }
+    
+        // `user.id` is the `user_id`
+        const userId = user.id;
+
         const { data, error } = await supabase
-          .from("vendor_data") // Replace with your table name
-          .select("*");
+        .from('vendor_data')
+        .select('*') // Select all columns
+        .eq('user_id', user.id) // Filter by the authenticated user's ID
+        .single(); // Fetch a single row (as user_id is unique)
+
   
         if (data) {
-          console.log(data[0]);
-          setUserData(data[0]);
+          setUserData(data);
         } else if (error) {
           console.error(error);
         }
@@ -26,16 +54,21 @@ export default function UserProfileDetail(){
     }, []);
 
     const { firstname, lastname, bussinessname, addressline1, addressline2, email, gst, phone, pin, residence, metadata } = userData;
-
+   
     const items = [
       {
-        label: (<Avatar style={{
-          display:'flex',
-          padding:'1rem',
-          alignItems:'center',
-          background:'black'
-        }}>{ firstname }</Avatar>),
+        label: (<Avatar> { firstname } </Avatar> ),
         key: 'user',
+      },
+      {
+        label: (  <Button
+          type="primary"
+          shape="round"
+          icon={<PoweroffOutlined />}
+          onClick={handleLogout}
+        >
+        </Button> ),
+        key: 'logout',
       },
   ]
 

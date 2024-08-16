@@ -65,6 +65,7 @@ body {
   margin: 0;
   /* 1 */
   line-height: inherit;
+  background-image: linear-gradient(to right, #a69fdf, #03A9F4);
   /* 2 */
 }
 

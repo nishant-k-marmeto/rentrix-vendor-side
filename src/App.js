@@ -15,7 +15,7 @@ import { AuthProvider } from "./authContext/AuthContext";
 export default function App() {
   return (
 
-    <Layout>
+    <Layout className="bg-gradient-to-r from-[#a69fdf] to-[#03A9F4]">
       <HeaderMain />
       <Outlet />
     </Layout>

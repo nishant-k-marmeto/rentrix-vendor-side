@@ -120,7 +120,7 @@ export default function Signup() {
 
 
     return (
-        <section className='bg-gradient-to-r from-[#a69fdf] to-[#03A9F4]'>
+        <section >
             <LoginHeader heading="Register Account" />
             <Form
                 className="w-full p-6 grid justify-center align-center"

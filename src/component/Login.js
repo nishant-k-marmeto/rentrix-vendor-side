@@ -12,16 +12,15 @@ export default function Login() {
 
   const onFinish = async (values) => {
     const { email, password } = values;
-    console.log('email', email + 'password', password);
     try {
       const { user, error } = await supabase.auth.signInWithPassword( {
         email, password,
       });
+     
       if (error) {
         console.error('Supabase error:', error.message);
         throw error;
       }
-        debugger
         navigate('/dashboard')
         login();
     } catch (error) {
@@ -30,7 +29,7 @@ export default function Login() {
   };
 
   return (
-    <section className='bg-gradient-to-r from-[#a69fdf] to-[#03A9F4]'>
+    <section>
       <LoginHeader heading='Log in' />
       <Form
         name="login"
