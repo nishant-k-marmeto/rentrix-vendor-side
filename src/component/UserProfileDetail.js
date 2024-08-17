@@ -58,24 +58,22 @@ export default function UserProfileDetail(){
     const items = [
       {
         label: ( <Steps
-          className="mr-auto"
+          className="mr-auto width-1/2"
+          size="small"
           current={1}
-          status="error"
           items={[
             {
-              title: 'Finished',
-              description:'Congratulation! Registration done',
+              title: 'Registration',
             },
             {
-              title: 'In Process',
-              description:'Upload the files for Verification'
+              title: 'Verification',
             },
             {
-              title: 'Waiting',
-              description:'Please upload the informations'
+              title: 'Onboarded',
             },
           ]}
-        /> ),
+        />
+      ),
         key: 'progress',
       },
       {
@@ -128,21 +126,26 @@ export default function UserProfileDetail(){
       },
       {
         key: '7',
+        label: 'PIN Code',
+        children: pin,
+      },
+      {
+        key: '8',
         label: 'State',
         children: residence,
       },
       {
-        key: '8',
+        key: '9',
         label: 'E-mail',
         children: email,
       },
       {
-        key: '9',
+        key: '10',
         label: 'Phone',
         children: phone,
       },
       {
-        key: '10',
+        key: '11',
         label: 'Store Number',
         children: metadata?.store_num,
       },
