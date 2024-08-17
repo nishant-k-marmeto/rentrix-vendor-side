@@ -5,11 +5,14 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  DiffOutlined
 } from '@ant-design/icons';
+import logo from '../assets/favicon/favicon-76x76.png';
 import { Button, Layout, Menu, theme } from 'antd';
 import UploadComponent from './UploadComponent';
 import TableContent from './TableContent';
 import UserProfileDetail from './UserProfileDetail';
+import Verfication from './Verification';
 
 const { Header, Sider, Content } = Layout;
 
@@ -29,9 +32,11 @@ export default function Dashboard() {
       case '1':
         return (<UserProfileDetail/>);
       case '2':
-        return (<TableContent/>);
+        return (<Verfication/>);
       case '3':
-        return (<UploadComponent/>);
+        return (<TableContent/>);
+      case '4':
+          return (<UploadComponent/>);
       default:
         return <div>Select a menu item</div>;
     }
@@ -40,7 +45,7 @@ export default function Dashboard() {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div className="demo-logo-vertical" />
+        <img src={logo} alt='logo-dash'/>
         <Menu
           theme="dark"
           mode="inline"
@@ -54,11 +59,16 @@ export default function Dashboard() {
             },
             {
               key: '2',
+              icon: <DiffOutlined />,
+              label: 'Verification',
+            },
+            {
+              key: '3',
               icon: <VideoCameraOutlined />,
               label: 'Device List',
             },
             {
-              key: '3',
+              key: '4',
               icon: <UploadOutlined />,
               label: 'Upload File',
             },

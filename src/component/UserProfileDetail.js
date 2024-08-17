@@ -57,8 +57,11 @@ export default function UserProfileDetail(){
    
     const items = [
       {
-        label: ( <Steps
-          className="mr-auto width-1/2"
+        label: ( <><Steps
+          style={{
+            margin:'auto',
+            width:'100%'
+          }}
           size="small"
           current={1}
           items={[
@@ -73,6 +76,7 @@ export default function UserProfileDetail(){
             },
           ]}
         />
+        </>
       ),
         key: 'progress',
       },
