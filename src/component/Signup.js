@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import LoginHeader from "./LoginHeader";
 import supabase from '../../supabase';
-import {
+import {Radio,
     Button,
     Cascader,
     Checkbox,
@@ -55,7 +55,7 @@ export default function Signup() {
     const showSuccessModal = () => {
         Modal.success({
             title: "Registration Successful",
-            content: "Thank you for Registration ",
+            content: "Thank you for Registration. please confirm the link sent in your e-mamil ",
             onOk() {
                 navigate("/login"); // Navigate to login page on OK
             },
@@ -77,39 +77,20 @@ export default function Signup() {
     const onFinish = async (values) => {
         console.log("values", values);
         try {
-            // Sign up user with Supabase
-            const { vendor_data, error: signupError } = await supabase.auth.signUp({
+           // Sign up user with Supabase
+            const { data, error } = await supabase.auth.signUp({
                 email: values.email,
                 password: values.password,
+                options: {
+                    data: {
+                        values
+                    }
+                }
             });
 
-            if (signupError) {
-                throw signupError;
+            if (error) {
+                throw error;
             }
-
-            // Insert additional user data into the 'users' table
-            const { error: insertError } = await supabase
-                .from('vendor_data')
-                .insert([
-                    {   user_id:supabase.auth.signUp.id,
-                        firstname: values.firstName,
-                        lastname: values.lastName,
-                        bussinessname: values.bussinessName,
-                        gst: values.gst,
-                        email: values.email,
-                        addressline1: values.addressLine1,
-                        addressline2: values.addressLine2,
-                        residence: values.residence,
-                        pin: values.pin,
-                        phone: values.phone,
-                        metadata: {}
-                    }
-                ]);
-
-            if (insertError) {
-                throw insertError;
-            }
-
             showSuccessModal();
             navigate('/login');
             console.log("SignUp:", user);
@@ -133,7 +114,17 @@ export default function Signup() {
                     prefix: "91",
                 }}
                 scrollToFirstError
+
             >
+                <Form.Item
+                    name="regType"
+                    label="Registration Type"
+                >
+                 <Checkbox value='vendor-form' checked disabled='disabled'>
+                    Vendor
+                </Checkbox>
+                </Form.Item>
+                
                 <Form.Item
                     name="firstName"
                     label="First Name"

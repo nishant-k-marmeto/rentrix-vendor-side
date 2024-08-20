@@ -8,7 +8,7 @@ import { data } from "autoprefixer";
 
 
 export default function UserProfileDetail(){
-    const emailVer = localStorage.getItem('email-user')
+  
     const [current, setCurrent] = useState('user');
     const [userData, setUserData] = useState({});
     const navigate = useNavigate();
@@ -26,25 +26,17 @@ export default function UserProfileDetail(){
 
     useEffect(() => {
       const fetchData = async () => {
-        const { data: { user }, errorr } = await supabase.auth.getUser();
+        const {data, error } = await supabase.auth.getUser();
+        console.log(data?.user?.user_metadata?.values);
+        const { userData } = data?.user?.user_metadata?.values
 
-        if (errorr) {
+        if (error) {
             console.error('Error fetching user:', error);
             return;
         }
     
-        // `user.id` is the `user_id`
-        const userId = user.id;
-
-        const { data, error } = await supabase
-        .from('vendor_data')
-        .select('*') // Select all columns
-        .eq('user_id', user.id) // Filter by the authenticated user's ID
-        .single(); // Fetch a single row (as user_id is unique)
-
-  
-        if (data) {
-          setUserData(data);
+        if (userData) {
+          setUserData(userData);
         } else if (error) {
           console.error(error);
         }

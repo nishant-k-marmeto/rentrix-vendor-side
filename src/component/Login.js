@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Checkbox, Form, Input, Flex } from 'antd';
-import LoginHeader from './LoginHeader';
+import { Button, Checkbox, Form, Input, notification } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import LoginHeader from './LoginHeader';
 import { useAuth } from '../authContext/AuthContext';
 import supabase from '../../supabase';
 
@@ -13,24 +13,31 @@ export default function Login() {
   const onFinish = async (values) => {
     const { email, password } = values;
     try {
-      const { user, error } = await supabase.auth.signInWithPassword( {
+      const { user, error } = await supabase.auth.signInWithPassword({
         email, password,
       });
-     
+
       if (error) {
         console.error('Supabase error:', error.message);
         throw error;
       }
-        navigate('/dashboard')
-        login();
+
+      navigate('/dashboard');
+      login(); // Uncomment this if you have a login function to call after successful login
     } catch (error) {
+      notification.error({
+        message: 'Login Error',
+        description: 'Invalid email or password. Please try again.',
+        placement: 'top', // You can set the placement to 'top', 'bottom', 'topLeft', 'topRight', etc.
+      });
       console.error('Login error:', error.message);
     }
   };
 
   return (
     <section>
-      <LoginHeader heading='Log in' />
+      <LoginHeader heading="Log in" />
+
       <Form
         name="login"
         initialValues={{
@@ -41,7 +48,7 @@ export default function Login() {
           alignItems: 'center',
           padding: '3rem',
           margin: 'auto',
-          flexDirection: 'column'
+          flexDirection: 'column',
         }}
         onFinish={onFinish}
       >
@@ -49,23 +56,26 @@ export default function Login() {
           name="email"
           rules={[
             {
-              type: "email",
-              message: "The input is not valid E-mail!",
+              type: 'email',
+              message: 'The input is not valid E-mail!',
             },
             {
               required: true,
-              message: "Please input your E-mail!",
+              message: 'Please input your E-mail!',
             },
           ]}
         >
-          <Input prefix={<UserOutlined />} placeholder="E-mail" />
+          <Input
+            prefix={<UserOutlined />}
+            placeholder="E-mail"
+          />
         </Form.Item>
         <Form.Item
           name="password"
           rules={[
             {
               required: true,
-              message: "Please input your Password!",
+              message: 'Please input your Password!',
             },
           ]}
         >
@@ -76,12 +86,10 @@ export default function Login() {
           />
         </Form.Item>
         <Form.Item>
-          <Flex justify="space-between" align="center">
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-            <a href="">Forgot password</a>
-          </Flex>
+          <Form.Item name="remember" valuePropName="checked" noStyle>
+            <Checkbox>Remember me</Checkbox>
+          </Form.Item>
+          <a href="">Forgot password</a>
         </Form.Item>
 
         <Form.Item>
@@ -90,9 +98,9 @@ export default function Login() {
           </Button>
           <span style={{ textAlign: 'center' }}>or</span>
           <Link to='/signup'>
-          <Button block type="primary" shape="round">
-            SignUp
-          </Button>
+            <Button block type="primary" shape="round">
+              SignUp
+            </Button>
           </Link>
         </Form.Item>
       </Form>
