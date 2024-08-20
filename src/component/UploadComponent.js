@@ -2,7 +2,7 @@ import React from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import { message, Upload } from 'antd';
 import Papa from 'papaparse';
-import supabase from '../../supabase'; // Adjust the import based on your setup
+import supabase from '../../supabase';
 
 const { Dragger } = Upload;
 
@@ -15,10 +15,11 @@ const UploadComponent = () => {
                 throw userError;
             }
             const userId = user.id;
-            // Insert each row of data into the 'vendor_data' table
+
+            // Upsert the parsed CSV data into the device_data column in the profiles table
             const { data, error } = await supabase
-            .from('vendor_data')
-            .upsert({ user_id: userId, metadata: dataToUpload });
+                .from('profiles')  // Ensure table name is correct
+                .upsert({ id: userId, device_data: dataToUpload });  // Insert data into device_data column
 
             if (error) {
                 throw error;
@@ -26,10 +27,10 @@ const UploadComponent = () => {
                 message.success('Data uploaded successfully!');
             }
         } catch (error) {
+            console.error('Upload error:', error);  // Log the error for debugging
             message.error('Failed to upload data.');
         }
     };
-
     // Custom request handler for file upload
     const customRequest = async ({ file, onSuccess, onError }) => {
         try {
@@ -37,14 +38,16 @@ const UploadComponent = () => {
                 header: true,
                 skipEmptyLines: true,
                 complete: async (results) => {
-                   // console.log(results.data); // Log data for debugging
-                    
+                    // Log data for debugging
+                    // console.log(results.data);
+
                     // Data processing if needed (e.g., transforming fields)
                     const processedData = results.data.map(row => ({
                         id: row.id,
                         laptop_model: row.laptop_model,
                         specification: row.specification,
-                        monthly_rate: row.monthly_rate
+                        monthly_rate: row.monthly_rate,
+                        // Add other necessary fields if needed
                     }));
 
                     await uploadData(processedData); // Upload processed data
