@@ -62,5 +62,9 @@ const appRouter = createBrowserRouter([
 ],
 );
 
-const root = ReactDOM.createRoot(document.getElementById("app")); // Use createRoot
-root.render( <AuthProvider><RouterProvider router={appRouter} /></AuthProvider>);
+const root = ReactDOM.createRoot(document.getElementById("app"));
+root.render(
+  <AuthProvider>
+    <RouterProvider router={appRouter} />
+  </AuthProvider>
+);

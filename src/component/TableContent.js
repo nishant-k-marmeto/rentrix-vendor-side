@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, Flex, message } from 'antd';
-import supabase from '../../supabase'; // Adjust the import based on your setup
+import { Table, Space, Button, message } from 'antd';
+import supabase from '../../supabase'; // Adjust the import path based on your setup
 
 const DataTableComponent = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  
+
+  // Fetch data on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,23 +51,42 @@ const DataTableComponent = () => {
     fetchData();
   }, []);
 
-  const handleAction = (record) => {
-    message.info(`Details for ${record.laptop_model}`);
-    // Implement the action logic here
-  };
-
+  // Handle deletion of an item
   const handleDelete = async (id) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', id);
+      // Get the logged-in user ID again
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) {
+        throw userError;
+      }
+      const userId = user.id;
 
-      if (error) {
-        throw error;
+      // Fetch the current device_data
+      const { data: fetchedData, error: fetchError } = await supabase
+        .from('profiles')
+        .select('device_data')
+        .eq('id', userId)
+        .single();
+
+      if (fetchError) {
+        throw fetchError;
       }
 
-      setData((prevData) => prevData.filter((item) => item.id !== id));
+      // Remove the item with the specified id from device_data
+      const updatedDeviceData = fetchedData.device_data.filter(item => item.id !== id);
+
+      // Update the device_data in the profiles table
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ device_data: updatedDeviceData })
+        .eq('id', userId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update the component state to reflect the change
+      setData(updatedDeviceData);
       message.success('Item deleted successfully');
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -74,6 +94,7 @@ const DataTableComponent = () => {
     }
   };
 
+  // Define the columns for the table
   const columns = [
     {
       title: 'Laptop Model',
@@ -81,32 +102,31 @@ const DataTableComponent = () => {
       key: 'laptop_model',
     },
     {
-      title: 'Specifications',
-      dataIndex: 'specification',
-      key: 'specification',
+      title: 'Specification',
+      dataIndex: 'specifications',
+      key: 'specifications',
     },
     {
       title: 'Monthly Rate',
-      dataIndex: 'monthly_rate',
-      key: 'monthly_rate',
-      render: (text) => `$${text}`,
+      dataIndex: 'rent_price_pm',
+      key: 'rent_price_pm',
+      render: (text) => `₹${text}`,
     },
     {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a href="#" onClick={() => handleAction(record)}>Details</a>
-          <a href="#" onClick={() => handleDelete(record.id)}>Delete</a>
+          <Button onClick={() => handleDelete(record.id)}>Delete</Button>
         </Space>
       ),
     },
   ];
 
+  // Row selection configuration
   const rowSelection = {
     selectedRowKeys,
     onChange: (newSelectedRowKeys) => {
-      console.log('Selected row keys changed:', newSelectedRowKeys);
       setSelectedRowKeys(newSelectedRowKeys);
     },
   };
@@ -114,17 +134,27 @@ const DataTableComponent = () => {
   const hasSelected = selectedRowKeys.length > 0;
 
   return (
-    <Flex gap="middle" vertical>
-      <Flex align="center" gap="middle">
+    <div style={{ padding: 24 }}>
+      <Space style={{ marginBottom: 16 }}>
         <Button type="primary" disabled={!hasSelected}>
           Reload
         </Button>
         {hasSelected ? `Selected ${selectedRowKeys.length} items` : null}
-      </Flex>
-      {loading ? <p>Loading...</p> : error ? <p>Error loading data: {error.message}</p> : (
-        <Table rowSelection={rowSelection} columns={columns} dataSource={data} rowKey="id" />
+      </Space>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>Error loading data: {error.message}</p>
+      ) : (
+        <Table
+          rowSelection={rowSelection}
+          columns={columns}
+          dataSource={data}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+        />
       )}
-    </Flex>
+    </div>
   );
 };
 

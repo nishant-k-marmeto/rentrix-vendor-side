@@ -38,15 +38,13 @@ const UploadComponent = () => {
                 header: true,
                 skipEmptyLines: true,
                 complete: async (results) => {
-                    // Log data for debugging
-                    // console.log(results.data);
 
                     // Data processing if needed (e.g., transforming fields)
                     const processedData = results.data.map(row => ({
                         id: row.id,
-                        laptop_model: row.laptop_model,
-                        specification: row.specification,
-                        monthly_rate: row.monthly_rate,
+                        laptop_model: row.product_title,
+                        specifications: row.specifications,
+                        rent_price_pm: row.rent_price_pm,
                         // Add other necessary fields if needed
                     }));
 
